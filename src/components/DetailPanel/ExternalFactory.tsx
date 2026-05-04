@@ -14,9 +14,7 @@ interface Props {
 }
 
 export function ExternalFactory({ factory: f }: Props) {
-  const imgUrls = splitCSV(f.productimages);
   const webUrls = splitCSV(f.websites);
-  const phoneList = splitCSV(f.phones);
   const histSubcats = f.historysubcategory
     ? f.historysubcategory.split(/,\s*\n/).map((s) => s.trim()).filter(Boolean)
     : [];
