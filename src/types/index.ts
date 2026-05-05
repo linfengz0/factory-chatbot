@@ -71,6 +71,7 @@ export interface QueryResultRow {
   coostring?: string;
   factorystatus?: string;
   factoryid?: number;
+  type?: string;
 }
 
 export interface QueryResultState {
@@ -78,6 +79,7 @@ export interface QueryResultState {
   errorMessage?: string;
   rows: QueryResultRow[];
   extraColumns: string[];
+  externalError?: string | null;
 }
 
 export interface QueryResultEvent {
@@ -93,6 +95,8 @@ export interface QueryResultEvent {
   display_mode?: 'table' | 'text';
   /** Some gateways emit camelCase; client accepts either. */
   displayMode?: 'table' | 'text';
+  external_error?: string | null;
+  externalError?: string | null;
 }
 
 export type WsServerEvent =
@@ -187,6 +191,7 @@ export interface ChatState {
     extraColumns: string[];
     isError: boolean;
     errorMessage?: string;
+    externalError?: string | null;
   } | null;
   connectionStatus: ConnectionStatus;
   subGraphLabel: string | null;
@@ -206,5 +211,5 @@ export type ChatAction =
   | { type: 'CLEAR_STATUS' }
   | { type: 'OPEN_FACTORY'; factory: Factory }
   | { type: 'CLOSE_FACTORY' }
-  | { type: 'SET_QUERY_RESULT';rows: QueryResultRow[]; extraColumns: string[]; isError: boolean; errorMessage?: string }
+  | { type: 'SET_QUERY_RESULT';rows: QueryResultRow[]; extraColumns: string[]; isError: boolean; errorMessage?: string; externalError?: string | null }
   | { type: 'SET_PENDING_INPUT'; value: string | null };

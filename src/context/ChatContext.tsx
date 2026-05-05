@@ -139,6 +139,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
               errorMessage: pending.errorMessage,
               rows: pending.rows,
               extraColumns: pending.extraColumns,
+              externalError: pending.externalError,
             },
           },
           ...msgs.slice(insertAt),
@@ -194,6 +195,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
             errorMessage: action.errorMessage,
             rows: action.rows,
             extraColumns: action.extraColumns,
+            externalError: action.externalError,
           },
         };
         return {
@@ -214,6 +216,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
           extraColumns: action.extraColumns,
           isError: action.isError,
           errorMessage: action.errorMessage,
+          externalError: action.externalError,
         },
       };
 

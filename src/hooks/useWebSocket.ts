@@ -109,6 +109,7 @@ export function useWebSocket() {
           const extraColumns = extraColumnsFromPayload(raw, qe.extra_columns ?? qe.extraColumns ?? []);
           const errMsg = errorFromQueryPayload(raw);
           const rows = rowsFromQueryPayload(raw);
+          const externalError = qe.external_error ?? qe.externalError ?? null;
           console.log(
             '[WS] query_result event:',
             JSON.stringify({
@@ -117,6 +118,7 @@ export function useWebSocket() {
               rowCount: rows?.length ?? 0,
               hasError: errMsg != null,
               extraColumns,
+              externalError,
             })
           );
           if (displayMode !== 'table') break;
@@ -135,6 +137,7 @@ export function useWebSocket() {
               rows,
               extraColumns,
               isError: false,
+              externalError,
             });
           } else {
             console.warn('[WS] query_result ignored: expected array rows or { rows|data|items: [] }, got', raw);

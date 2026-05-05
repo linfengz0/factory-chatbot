@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
-import type { QueryResultState, QueryResultRow, InternalFactory } from '../../types';
+import type { QueryResultState, QueryResultRow, InternalFactory, ExternalFactory } from '../../types';
 import { useChatDispatch } from '../../context/ChatContext';
 
 interface Props {
@@ -192,6 +192,37 @@ function toInternalFactory(row: QueryResultRow): InternalFactory {
   };
 }
 
+function toExternalFactory(row: QueryResultRow): ExternalFactory {
+  return {
+    type: 'external',
+    id: null,
+    factoryname: String(row.factoryname ?? ''),
+    coostring: String(row.coostring ?? ''),
+    productimages: row.productimages ? String(row.productimages) : null,
+    description: String(row.description ?? ''),
+    historysubcategory: String(row.historysubcategory ?? ''),
+    logo: row.logo ? String(row.logo) : null,
+    employeecount: String(row.employeecount ?? ''),
+    keyexportmarket: String(row.keyexportmarket ?? ''),
+    esg: row.esg ? String(row.esg) : '',
+    subcategory: String(row.subcategory ?? ''),
+    emails: String(row.emails ?? ''),
+    phones: String(row.phones ?? ''),
+    mainhistorybrand: String(row.mainhistorybrand ?? ''),
+    yearfounded: String(row.yearfounded ?? ''),
+    address: String(row.address ?? ''),
+    businesstype: String(row.businesstype ?? ''),
+    websites: String(row.websites ?? ''),
+  };
+}
+
+function factoryFromRow(row: QueryResultRow): InternalFactory | ExternalFactory {
+  if (row.type === 'External Factory') {
+    return toExternalFactory(row);
+  }
+  return toInternalFactory(row);
+}
+
 function exportExcel(rows: QueryResultRow[], extraColumns: string[]) {
   const hasCapacityResult = extraColumns.includes('capacity_result');
   const infoExtraColumns = extraColumns.filter((c) => c !== 'capacity_result');
@@ -292,8 +323,16 @@ export function QueryResultCard({ data }: Props) {
   const hasMore = totalRows > DISPLAY_LIMIT;
   const showExportFooter = (expanded || !needsCollapse) && hasMore;
 
+  const externalError = data.externalError ?? null;
+
   return (
     <div className="qr-card">
+      {externalError && (
+        <div className="qr-external-warning">
+          <span className="qr-external-warning-icon">!</span>
+          {externalError}
+        </div>
+      )}
       <div className="qr-table-wrap">
         <table className="qr-table">
           <thead>
@@ -310,11 +349,20 @@ export function QueryResultCard({ data }: Props) {
                 {dRow.isFirstSubRow && (
                   <td rowSpan={dRow.infoRowSpan}>
                     <span
-                      className="qr-factory-link"
-                      onClick={() => dispatch({ type: 'OPEN_FACTORY', factory: toInternalFactory(dRow.rowData) })}
+                      className={`qr-factory-link${
+                        dRow.rowData.type === 'Internal Factory' ? ' qr-factory-internal' :
+                        dRow.rowData.type === 'External Factory' ? ' qr-factory-external' : ''
+                      }`}
+                      onClick={() => dispatch({ type: 'OPEN_FACTORY', factory: factoryFromRow(dRow.rowData) })}
                     >
                       {dRow.rowData.factoryname != null ? String(dRow.rowData.factoryname) : ''}
                     </span>
+                    {dRow.rowData.type === 'Internal Factory' && (
+                      <span className="qr-type-tag qr-type-tag-internal">Internal</span>
+                    )}
+                    {dRow.rowData.type === 'External Factory' && (
+                      <span className="qr-type-tag qr-type-tag-external">External</span>
+                    )}
                   </td>
                 )}
                 {/* 2. Capacity columns — right after factory name, no rowspan */}
