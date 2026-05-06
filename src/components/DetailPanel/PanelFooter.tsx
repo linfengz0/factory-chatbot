@@ -8,7 +8,8 @@ interface Props {
 export function PanelFooter({ factory }: Props) {
   const dispatch = useChatDispatch();
   const factoryId = 'factoryid' in factory ? factory.factoryid : (factory.id || '');
-  const srmUrl = `https://platform-uat.leverstyle.net/oauth/v2/redirect?idp=sso-ls&hash=FactoryID/${factoryId}/Business/Platform/Scroll/0`;
+  const srmUrl = `https://platform.leverstyle.com/p/GeneralInformationView/${factoryId}`;
+  const isExternal = factory.type === 'external';
 
   const handleAskAI = () => {
     dispatch({ type: 'CLOSE_FACTORY' });
@@ -17,7 +18,14 @@ export function PanelFooter({ factory }: Props) {
 
   return (
     <div className="panel-footer">
-      <a href={srmUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ textDecoration: 'none', textAlign: 'center' }}>
+      <a
+        href={isExternal ? undefined : srmUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`btn btn-secondary${isExternal ? ' disabled' : ''}`}
+        style={{ textDecoration: 'none', textAlign: 'center' }}
+        onClick={isExternal ? (e) => e.preventDefault() : undefined}
+      >
         Open in SRM
       </a>
       <button className="btn" onClick={handleAskAI}>Ask AI more</button>

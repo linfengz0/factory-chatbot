@@ -385,9 +385,11 @@ body {
 }
 
 .btn:hover { background: var(--ls-accent-dk); }
-.btn:disabled {
+.btn:disabled,
+.btn.disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .btn-secondary {
