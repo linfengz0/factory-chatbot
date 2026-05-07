@@ -20,7 +20,7 @@ export function Login() {
       <div className="login-card">
         <div className="login-header">
           <div className="login-logo" />
-          <h1>Factory AI</h1>
+          <h1>Leverstyle</h1>
           <p>Sign in to your account</p>
         </div>
 

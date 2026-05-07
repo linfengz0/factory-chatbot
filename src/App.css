@@ -72,22 +72,26 @@ body {
   padding: 20px 16px 16px;
 }
 
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .sidebar-logo {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--ls-ink);
   margin-bottom: 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  width: 100%;
 }
 
-.sidebar-logo::before {
-  content: '';
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--ls-accent);
+.sidebar-logo img {
+  display: block;
+  height: 22px;
+  width: auto;
+  object-fit: contain;
+  padding-right: 8px;
 }
 
 .sidebar-new-chat {
