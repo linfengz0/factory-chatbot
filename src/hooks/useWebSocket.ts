@@ -87,15 +87,22 @@ export function useWebSocket() {
     (event: WsServerEvent) => {
       switch (event.type) {
         case 'history':
-          dispatch({ type: 'SET_HISTORY', messages: (event as HistoryEvent).messages, sessionId });
+          dispatch({
+            type: 'SET_HISTORY',
+            messages: (event as HistoryEvent).messages,
+            sessionId: sessionId ?? undefined,
+          });
           break;
 
         case 'system':
-          dispatch({
-            type: 'ADD_SYSTEM_MSG',
-            content: event.content,
-            timestamp: new Date().toISOString(),
-          });
+          // Suppress connection banner; shown as status dot instead
+          if (!event.content.includes('Connection successful')) {
+            dispatch({
+              type: 'ADD_SYSTEM_MSG',
+              content: event.content,
+              timestamp: new Date().toISOString(),
+            });
+          }
           break;
 
         case 'sub_graph_status':

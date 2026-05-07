@@ -7,7 +7,7 @@ import './Sidebar.css';
 export function Sidebar() {
   const { connectionStatus, sessionId } = useChatState();
   const { logout } = useAuth();
-  const [tick, setTick] = useState(0);
+  const [, setTick] = useState(0);
   const sessions = getSessionList();
 
   const handleRemove = useCallback((id: string, e: React.MouseEvent) => {

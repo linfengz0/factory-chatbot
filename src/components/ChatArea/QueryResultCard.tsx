@@ -35,7 +35,7 @@ const DYNAMIC_LABELS: Record<string, string> = {
 };
 
 const DISPLAY_LIMIT = 20;
-const COLLAPSE_LIMIT = 5;
+const COLLAPSE_LIMIT = 12;
 
 const CAPACITY_COLUMNS = ['productCat', 'month', 'originalCapacity', 'totalDemand', 'remainingCapacity', 'status'];
 

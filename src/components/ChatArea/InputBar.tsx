@@ -49,6 +49,10 @@ export function InputBar({ sendMessage }: InputBarProps) {
 
   return (
     <form className="input-bar" onSubmit={handleSubmit}>
+      <span
+        className={`conn-dot${isConnected ? ' connected' : ''}`}
+        title={isConnected ? 'Connected' : 'Disconnected'}
+      />
       <input
         ref={inputRef}
         type="text"

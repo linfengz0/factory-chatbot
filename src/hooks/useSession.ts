@@ -57,8 +57,12 @@ export function removeSession(id: string) {
 
   const current = localStorage.getItem(SESSION_KEY);
   if (current === id) {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.reload();
+    if (updated.length > 0) {
+      switchSession(updated[0].id);
+    } else {
+      localStorage.removeItem(SESSION_KEY);
+      window.location.reload();
+    }
   }
 }
 
@@ -70,25 +74,31 @@ export function useSession() {
     const existing = localStorage.getItem(SESSION_KEY);
     if (existing) {
       dispatch({ type: 'SET_SESSION_ID', sessionId: existing });
-    } else {
-      createSession()
-        .then((id) => {
-          localStorage.setItem(SESSION_KEY, id);
-          const list = getSessionList();
-          const filtered = list.filter((s) => s.id !== id);
-          filtered.unshift({ id, label: 'New Chat', createdAt: new Date().toISOString() });
-          saveSessionList(filtered);
-          dispatch({ type: 'SET_SESSION_ID', sessionId: id });
-        })
-        .catch((err) => {
-          console.error('Failed to create session:', err);
-          dispatch({
-            type: 'ADD_SYSTEM_MSG',
-            content: '连接服务器失败，请检查网络后刷新页面。',
-            timestamp: new Date().toISOString(),
-          });
-        });
+      return;
     }
+
+    let cancelled = false;
+    createSession()
+      .then((id) => {
+        if (cancelled) return;
+        localStorage.setItem(SESSION_KEY, id);
+        const list = getSessionList();
+        const filtered = list.filter((s) => s.id !== id);
+        filtered.unshift({ id, label: 'New Chat', createdAt: new Date().toISOString() });
+        saveSessionList(filtered);
+        dispatch({ type: 'SET_SESSION_ID', sessionId: id });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error('Failed to create session:', err);
+        dispatch({
+          type: 'ADD_SYSTEM_MSG',
+          content: '连接服务器失败，请检查网络后刷新页面。',
+          timestamp: new Date().toISOString(),
+        });
+      });
+
+    return () => { cancelled = true; };
   }, [dispatch]);
 
   return { sessionId };
