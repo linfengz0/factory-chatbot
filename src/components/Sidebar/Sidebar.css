@@ -2,3 +2,75 @@
   text-align: center;
   margin-top: 4px;
 }
+
+/* History item wrapper (replaces the old button-only .history-item) */
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-radius: var(--radius-md);
+  transition: background .15s;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: default;
+  width: 100%;
+  color: var(--ls-charcoal);
+}
+
+.history-item:hover { background: var(--ls-surface); }
+.history-item.active {
+  background: var(--ls-accent-lt);
+  color: var(--ls-accent-dk);
+  font-weight: 500;
+}
+
+.history-item-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 0 9px 11px;
+  cursor: pointer;
+  font-size: 14px;
+  color: inherit;
+  font-family: inherit;
+  border: none;
+  background: none;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-main svg { flex-shrink: 0; opacity: .6; }
+.history-item.active .history-item-main svg { opacity: 1; }
+.history-item-main span { overflow: hidden; text-overflow: ellipsis; }
+
+.history-item-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+  border: none;
+  background: none;
+  color: var(--ls-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity .15s, color .15s;
+}
+
+.history-item:hover .history-item-close,
+.history-item.active .history-item-close {
+  opacity: 1;
+}
+
+.history-item-close:hover {
+  color: var(--ls-danger, #e5484d);
+  background: var(--ls-surface);
+}

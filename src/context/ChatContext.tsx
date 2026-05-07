@@ -2,32 +2,36 @@ import { createContext, useContext, useReducer, useEffect, type ReactNode } from
 import type { ChatState, ChatAction, HistoryMessage, Message } from '../types';
 import { generateId } from '../utils/helpers';
 
-const STORAGE_KEY = 'factory_chat_messages';
+const STORAGE_PREFIX = 'factory_chat_messages';
 
-function saveMessages(messages: Message[]) {
+function storageKey(sessionId: string): string {
+  return `${STORAGE_PREFIX}_${sessionId}`;
+}
+
+function saveMessages(sessionId: string, messages: Message[]) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    localStorage.setItem(storageKey(sessionId), JSON.stringify(messages));
   } catch { /* storage full or unavailable */ }
 }
 
-function loadMessages(): Message[] | null {
+function loadMessages(sessionId: string): Message[] | null {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey(sessionId));
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-function clearSavedMessages() {
+function clearSavedMessages(sessionId: string) {
   try {
-    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey(sessionId));
   } catch { /* ignore */ }
 }
 
 const initialState: ChatState = {
   sessionId: null,
-  messages: loadMessages() || [],
+  messages: [],
   streamingMsgId: null,
   pendingQueryResult: null,
   connectionStatus: 'disconnected',
@@ -38,20 +42,23 @@ const initialState: ChatState = {
 
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
-    case 'SET_SESSION_ID':
-      return { ...state, sessionId: action.sessionId };
+    case 'SET_SESSION_ID': {
+      const msgs = loadMessages(action.sessionId);
+      return { ...state, sessionId: action.sessionId, messages: msgs ?? [] };
+    }
 
     case 'SET_CONNECTION_STATUS':
       return { ...state, connectionStatus: action.status };
 
     case 'SET_HISTORY': {
+      const sid = action.sessionId || state.sessionId;
       // Use saved messages if they exist and server history is non-empty (resumed session)
-      const saved = loadMessages();
+      const saved = sid ? loadMessages(sid) : null;
       if (saved && saved.length > 0 && action.messages.length > 0) {
         return { ...state, messages: saved };
       }
       if (action.messages.length === 0) {
-        clearSavedMessages();
+        if (sid) clearSavedMessages(sid);
         return { ...state, messages: [] };
       }
       const msgs: Message[] = action.messages.map((m: HistoryMessage) => ({
@@ -240,10 +247,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   // Persist messages so query_result tables survive page refresh
   useEffect(() => {
-    if (state.messages.length > 0) {
-      saveMessages(state.messages);
+    if (state.messages.length > 0 && state.sessionId) {
+      saveMessages(state.sessionId, state.messages);
     }
-  }, [state.messages]);
+  }, [state.messages, state.sessionId]);
 
   return (
     <ChatContext.Provider value={{ state, dispatch }}>

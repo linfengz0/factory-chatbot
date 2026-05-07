@@ -133,21 +133,12 @@ body {
 .history-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
   border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--ls-charcoal);
   transition: background .15s;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: inherit;
-  border: none;
-  background: none;
   width: 100%;
-  text-align: left;
+  color: var(--ls-charcoal);
 }
 
 .history-item:hover { background: var(--ls-surface); }
@@ -156,9 +147,6 @@ body {
   color: var(--ls-accent-dk);
   font-weight: 500;
 }
-.history-item svg { flex-shrink: 0; opacity: .6; }
-.history-item.active svg { opacity: 1; }
-.history-item span { overflow: hidden; text-overflow: ellipsis; }
 
 .sidebar-footer {
   margin-top: auto;

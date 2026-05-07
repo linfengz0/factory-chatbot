@@ -202,7 +202,7 @@ export interface ChatState {
 export type ChatAction =
   | { type: 'SET_SESSION_ID'; sessionId: string }
   | { type: 'SET_CONNECTION_STATUS'; status: ConnectionStatus }
-  | { type: 'SET_HISTORY'; messages: HistoryMessage[] }
+  | { type: 'SET_HISTORY'; messages: HistoryMessage[]; sessionId?: string }
   | { type: 'ADD_USER_MESSAGE'; content: string; timestamp: string }
   | { type: 'START_STREAM'; msgId: string }
   | { type: 'APPEND_STREAM'; content: string; isFinal: boolean }

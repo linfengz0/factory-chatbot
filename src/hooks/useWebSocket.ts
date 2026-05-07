@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useChatDispatch, useChatState } from '../context/ChatContext';
 import { createWebSocket } from '../services/api';
-import type { QueryResultEvent, QueryResultRow, StreamEvent, WsServerEvent } from '../types';
+import type { HistoryEvent, QueryResultEvent, QueryResultRow, StreamEvent, WsServerEvent } from '../types';
 
 function streamIsFinal(e: StreamEvent): boolean {
   return e.is_final === true || e.isFinal === true;
@@ -87,7 +87,7 @@ export function useWebSocket() {
     (event: WsServerEvent) => {
       switch (event.type) {
         case 'history':
-          dispatch({ type: 'SET_HISTORY', messages: event.messages });
+          dispatch({ type: 'SET_HISTORY', messages: (event as HistoryEvent).messages, sessionId });
           break;
 
         case 'system':
@@ -177,7 +177,7 @@ export function useWebSocket() {
           break;
       }
     },
-    [dispatch]
+    [dispatch, sessionId]
   );
 
   const scheduleReconnect = useCallback(() => {

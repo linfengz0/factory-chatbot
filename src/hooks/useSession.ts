@@ -38,6 +38,30 @@ export function updateSessionLabel(id: string, label: string) {
   }
 }
 
+export function newSession() {
+  localStorage.removeItem(SESSION_KEY);
+  window.location.reload();
+}
+
+function clearMessagesForSession(sessionId: string) {
+  try {
+    localStorage.removeItem(`factory_chat_messages_${sessionId}`);
+  } catch { /* ignore */ }
+}
+
+export function removeSession(id: string) {
+  const list = getSessionList();
+  const updated = list.filter((s) => s.id !== id);
+  saveSessionList(updated);
+  clearMessagesForSession(id);
+
+  const current = localStorage.getItem(SESSION_KEY);
+  if (current === id) {
+    localStorage.removeItem(SESSION_KEY);
+    window.location.reload();
+  }
+}
+
 export function useSession() {
   const dispatch = useChatDispatch();
   const { sessionId } = useChatState();
@@ -67,10 +91,5 @@ export function useSession() {
     }
   }, [dispatch]);
 
-  const newSession = async () => {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.reload();
-  };
-
-  return { sessionId, newSession };
+  return { sessionId };
 }
