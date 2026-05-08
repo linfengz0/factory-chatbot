@@ -194,6 +194,8 @@ export interface ChatState {
     externalError?: string | null;
   } | null;
   connectionStatus: ConnectionStatus;
+  /** Per-session WebSocket connection status (active = green dot in sidebar). */
+  wsSessions: Record<string, ConnectionStatus>;
   subGraphLabel: string | null;
   selectedFactory: Factory | null;
   pendingInput: string | null;
@@ -212,4 +214,5 @@ export type ChatAction =
   | { type: 'OPEN_FACTORY'; factory: Factory }
   | { type: 'CLOSE_FACTORY' }
   | { type: 'SET_QUERY_RESULT';rows: QueryResultRow[]; extraColumns: string[]; isError: boolean; errorMessage?: string; externalError?: string | null }
+  | { type: 'SET_WS_SESSION_STATUS'; sessionId: string; status: ConnectionStatus }
   | { type: 'SET_PENDING_INPUT'; value: string | null };

@@ -6,7 +6,7 @@ import { ChatArea } from './components/ChatArea/ChatArea';
 import { DetailPanel } from './components/DetailPanel/DetailPanel';
 import { Login } from './components/Login';
 import { useSession, updateSessionLabel, getSessionList } from './hooks/useSession';
-import { useWebSocket } from './hooks/useWebSocket';
+import { useWebSocketPool } from './hooks/useWebSocketPool';
 import './App.css';
 
 function AppShell() {
@@ -15,7 +15,7 @@ function AppShell() {
   const labelUpdated = useRef(false);
 
   // Always call the hook — it no-ops when sessionId is null
-  const { sendMessage } = useWebSocket();
+  const { sendMessage } = useWebSocketPool();
 
   // Update session label on first user message
   useEffect(() => {

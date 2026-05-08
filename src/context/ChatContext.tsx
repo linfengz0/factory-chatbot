@@ -8,13 +8,13 @@ function storageKey(sessionId: string): string {
   return `${STORAGE_PREFIX}_${sessionId}`;
 }
 
-function saveMessages(sessionId: string, messages: Message[]) {
+export function saveMessages(sessionId: string, messages: Message[]) {
   try {
     localStorage.setItem(storageKey(sessionId), JSON.stringify(messages));
   } catch { /* storage full or unavailable */ }
 }
 
-function loadMessages(sessionId: string): Message[] | null {
+export function loadMessages(sessionId: string): Message[] | null {
   try {
     const raw = localStorage.getItem(storageKey(sessionId));
     return raw ? JSON.parse(raw) : null;
@@ -35,6 +35,7 @@ const initialState: ChatState = {
   streamingMsgId: null,
   pendingQueryResult: null,
   connectionStatus: 'disconnected',
+  wsSessions: {},
   subGraphLabel: null,
   selectedFactory: null,
   pendingInput: null,
@@ -43,12 +44,35 @@ const initialState: ChatState = {
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case 'SET_SESSION_ID': {
+      // Save current session messages before switching
+      if (state.sessionId && state.sessionId !== action.sessionId) {
+        saveMessages(state.sessionId, state.messages);
+      }
+      localStorage.setItem('factory_chat_session_id', action.sessionId);
       const msgs = loadMessages(action.sessionId);
-      return { ...state, sessionId: action.sessionId, messages: msgs ?? [] };
+      return {
+        ...state,
+        sessionId: action.sessionId,
+        messages: msgs ?? [],
+        streamingMsgId: null,
+        pendingQueryResult: null,
+        subGraphLabel: null,
+        connectionStatus: 'disconnected',
+      };
     }
 
     case 'SET_CONNECTION_STATUS':
       return { ...state, connectionStatus: action.status };
+
+    case 'SET_WS_SESSION_STATUS': {
+      const next = { ...state.wsSessions, [action.sessionId]: action.status };
+      return {
+        ...state,
+        wsSessions: next,
+        // If this is the active session, also update connectionStatus
+        ...(action.sessionId === state.sessionId ? { connectionStatus: action.status } : {}),
+      };
+    }
 
     case 'SET_HISTORY': {
       const sid = action.sessionId || state.sessionId;

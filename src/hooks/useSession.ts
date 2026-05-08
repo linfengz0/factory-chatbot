@@ -26,7 +26,6 @@ function saveSessionList(list: StoredSession[]) {
 
 export function switchSession(id: string) {
   localStorage.setItem(SESSION_KEY, id);
-  window.location.reload();
 }
 
 export function updateSessionLabel(id: string, label: string) {
@@ -38,9 +37,15 @@ export function updateSessionLabel(id: string, label: string) {
   }
 }
 
-export function newSession() {
-  localStorage.removeItem(SESSION_KEY);
-  window.location.reload();
+export function newSession(): Promise<string> {
+  return createSession().then((id) => {
+    localStorage.setItem(SESSION_KEY, id);
+    const list = getSessionList();
+    const filtered = list.filter((s) => s.id !== id);
+    filtered.unshift({ id, label: 'New Chat', createdAt: new Date().toISOString() });
+    saveSessionList(filtered);
+    return id;
+  });
 }
 
 function clearMessagesForSession(sessionId: string) {
@@ -49,7 +54,7 @@ function clearMessagesForSession(sessionId: string) {
   } catch { /* ignore */ }
 }
 
-export function removeSession(id: string) {
+export function removeSession(id: string): string | null {
   const list = getSessionList();
   const updated = list.filter((s) => s.id !== id);
   saveSessionList(updated);
@@ -59,11 +64,14 @@ export function removeSession(id: string) {
   if (current === id) {
     if (updated.length > 0) {
       switchSession(updated[0].id);
+      return updated[0].id;
     } else {
       localStorage.removeItem(SESSION_KEY);
       window.location.reload();
+      return null;
     }
   }
+  return null;
 }
 
 export function useSession() {
